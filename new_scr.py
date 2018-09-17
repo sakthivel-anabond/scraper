@@ -16,7 +16,15 @@ except Exception as e:
 # search_parames = ['anbond','adhcsive','loctite','dow cornind','molykote','grease','lubricant','silicone','sealants','chemicals','paints','polyurethane','sikaflex','cleaners','tapes']
 search_parames = ['adhesive','loctite']
 
+def save_pdf(tender_id,url):
+	import requests
 
+	url = url
+	r = requests.get(url, stream=True)
+	chunk_size = 2000
+	with open('/Users/sakthivel/Desktop/scrapy/tender_'+tender_id+'.pdf', 'wb') as fd:
+	    for chunk in r.iter_content(chunk_size):
+	        fd.write(chunk)
 
 def get_details():
 	print("***********")
@@ -37,7 +45,7 @@ def get_details():
 		print(driver.current_url)
 		time.sleep(20)
 		driver.quit()
-# get_details()
+get_details()
 for search in search_parames:
 	# driver = webdriver.Chrome()  # Optional argument, if not specified will search path.
 	driver = webdriver.Chrome()
