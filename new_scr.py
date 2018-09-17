@@ -18,7 +18,6 @@ search_parames = ['adhesive','loctite']
 
 def save_pdf(tender_id,url):
 	import requests
-
 	url = url
 	r = requests.get(url, stream=True)
 	chunk_size = 2000
@@ -86,14 +85,10 @@ for search in search_parames:
 		reminder = search_results%25
 		if reminder > 0:
 			pages = pages+1
-	print(pages)
-	print("TOTAL PAGESSSSS ***********")
 	if pages > 1:
 		next_page_url = driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[9]/td[2]/a[1]")
 		next_page_url = next_page_url.get_attribute('href')
 		parameters = next_page_url.split("&")
-		print(next_page_url)
-		print("################################")
 		j=1
 		for parameter in parameters:
 			parameter_name = parameter.split("=")
@@ -106,19 +101,8 @@ for search in search_parames:
 		url = url+'&pageNo='
 	for i in range(1, pages+1):
 		if i !=1:
-			print("URLLLLLLLLLLLL ******** !!!!!!")
-			print(url)
-			print("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[9]/td[2]/a[%s]" % i)
-			print('///////////////')
-			# driver = webdriver.Chrome()
-			# driver.implicitly_wait(10)
-			# driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[9]/td[2]/a[%s]" % i).click()
-
-			# driver.find_element_by_link_text(str(i)).click()
 			driver.get(url+str(i))
-
 		table = driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[7]/td/table")
-		# print(table.get_attribute('innerHTML'))
 		rows = table.find_elements_by_tag_name("tr") # get all of the rows in the table
 		total_tenders = []
 		i =0
