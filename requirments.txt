@@ -1,2 +1,4 @@
 selenium==3.14.0
 MySQL-python==1.2.5
+PyPDF2
+#https://github.com/jalan/pdftotext
