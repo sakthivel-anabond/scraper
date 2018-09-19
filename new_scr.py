@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.action_chains import ActionChains
 import MySQLdb
-import datetime
+# import datetime
 import requests
 
 import pdftotext
@@ -12,8 +12,15 @@ import io
 import re
 import json
 
-current_date = datetime.datetime.now()
-after_one_month = current_date.strftime("%d/%m/%Y")
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+current_date = datetime.today()
+
+after_one_month = current_date+ relativedelta(months=1)
+
+# current_date = datetime.datetime.now()
+after_one_month = after_one_month.strftime("%d/%m/%Y")
 created_date = current_date.strftime("%Y-%m-%d")
 try:
 	db = MySQLdb.connect('localhost','root','root@123','railway')
@@ -21,8 +28,8 @@ try:
 except Exception as e:
 	print("ERRORRRRRRR ----- -----")
 	print(e)
-# search_parames = ['anbond','adhcsive','loctite','dow cornind','molykote','grease','lubricant','silicone','sealants','chemicals','paints','polyurethane','sikaflex','cleaners','tapes']
-search_parames = ['adhesive','loctite']
+search_parames = ['anbond','adhcsive','loctite','dow cornind','molykote','grease','lubricant','silicone','sealants','chemicals','paints','polyurethane','sikaflex','cleaners','tapes']
+# search_parames = ['adhesive','loctite']
 
 def save_pdf(tender_id,url):
 	
@@ -34,9 +41,10 @@ def save_pdf(tender_id,url):
 	        fd.write(chunk)
 
 def get_details():
+	# requests.post('http://localhost:8000/post-tender/', data = {'key':'value'})
 	print("*********** Newww")
-	# sql = """ select * from tender where created_date='%s' """%(created_date)
-	sql = """ select * from tender """ 
+	sql = """ select * from tender where created_date='%s' """%(created_date)
+	# sql = """ select * from tender """ 
 	cursor.execute(sql)
 	datas = cursor.fetchall()
 	# print(datas)
@@ -94,7 +102,7 @@ def get_details():
 		headers = {
 	        'Content-Type': 'application/json',
 	    }
-		response = requests.post('http://localhost:8000/post-tender/', headers=headers, params={},data=data)
+		response = requests.post('http://localhost:8000/post-tender/',data=data)
 
 		time.sleep(20)
 		driver.quit()
@@ -114,6 +122,8 @@ for search in search_parames:
 	# Select(driver.find_element_by_id("division")).select_by_visible_text("Stores")
 	# driver.find_element_by_name("dateFrom").__setattr__("value","03/10/2018")
 	# 
+	print("AFTERRRRRRRRR ONE MONNNN::")
+	print(after_one_month)
 	dateto=driver.find_element_by_name("dateTo")
 	driver.execute_script('arguments[0].setAttribute("value","'+after_one_month+'");', dateto)
 	# driver.execute_script('arguments[0].setAttribute("value","31/12/2018");', dateto)
@@ -132,13 +142,18 @@ for search in search_parames:
 	# driver.find_element_by_xpath("//*[@id='searchButtonBlock']/td/input[1]").click
 	#for da in driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[7]/td/table/tr"):
 	#    print("test ---------------------------- *****************************")
-	search_results = driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[6]/td/table/tbody/tr/td/b[2]")
-	search_results = int(search_results.text)
-	if search_results:
-		pages = search_results/25
-		reminder = search_results%25
-		if reminder > 0:
-			pages = pages+1
+	try:
+		search_results = driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[6]/td/table/tbody/tr/td/b[2]")
+		search_results = int(search_results.text)
+		if search_results:
+			pages = search_results/25
+			reminder = search_results%25
+			if reminder > 0:
+				pages = pages+1
+	except Exception as e:
+		pages = 0
+		# raise e
+	
 	if pages > 1:
 		next_page_url = driver.find_element_by_xpath("/html/body/table/tbody/tr[4]/td[2]/table/tbody/tr/td/div/table/tbody/tr[1]/td/table/tbody/tr[2]/td/form/table[3]/tbody/tr[9]/td[2]/a[1]")
 		next_page_url = next_page_url.get_attribute('href')
@@ -213,7 +228,7 @@ for search in search_parames:
 			tender_id = ten['tender_id']
 			print("******")
 			print(due_date_time+"::")
-			due_date_time = datetime.datetime.strptime(str(due_date_time), '%d/%m/%Y %H:%M').strftime('%Y-%m-%d %H:%M:%S')
+			due_date_time = datetime.strptime(str(due_date_time), '%d/%m/%Y %H:%M').strftime('%Y-%m-%d %H:%M:%S')
 			print(due_date_time)
 			sql = """ select * from tender where tender_id='%s' """%(tender_id)
 			cursor.execute(sql)
@@ -228,7 +243,8 @@ for search in search_parames:
 	time.sleep(10)
 	driver.quit()
 
-	if search == 'loctite':
+	if search == 'tapes':
+		time.sleep(10)
 		get_details()
 
 db.close()
